@@ -2418,7 +2418,7 @@ namespace LilyPath
 
             double slice = Math.PI * 2 / divisions;
 
-            List<Vector2> unitCircle = new List<Vector2>();
+            List<Vector2> unitCircle = new List<Vector2>(divisions);
 
             for (int i = 0; i < divisions; i++) {
                 double angle = -slice * i;
