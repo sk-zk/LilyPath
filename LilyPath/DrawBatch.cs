@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using LilyPath.Utility;
+using System.Linq;
 
 namespace LilyPath
 {
@@ -1888,6 +1889,45 @@ namespace LilyPath
 
             if (_sortMode == DrawSortMode.Immediate)
                 FlushBuffer();
+        }
+
+        public void FillCrescent (Brush brush, Vector2 center, float radius, float rotation, float progress, int subdivisions)
+        {
+            if (progress == 0) return;
+            
+            subdivisions *= 2;
+
+            // get 180° arc
+            List<Vector2> unitCircle = CalculateCircleSubdivisions(subdivisions);
+            List<Vector2> staticArc = unitCircle.GetRange(0, (subdivisions / 2) + 1);
+
+            // create the second arc by squashing a copy of the first
+            List<Vector2> transformedArc = new List<Vector2>(staticArc);
+            transformedArc = transformedArc.GetRange(1, transformedArc.Count - 2); // remove duplicate points
+            float scale = -((progress * 2) - 1);
+            Matrix arcTransform = Matrix.CreateScale(1, scale, 1);
+            for (int i = 0; i < transformedArc.Count; i++)
+            {
+                transformedArc[i] = Vector2.Transform(transformedArc[i], arcTransform);
+            }
+
+            // turn it into a path
+            int pointsCount = staticArc.Count + transformedArc.Count;
+            Vector2[] points = new Vector2[pointsCount];
+            Matrix transform = Matrix.CreateRotationZ(rotation)
+                * Matrix.CreateScale(radius)
+                * Matrix.CreateTranslation(center.X, center.Y, 0);
+            int point = 0;
+            for (int i = staticArc.Count - 1; i >= 0; i--)
+            {
+                points[point++] = Vector2.Transform(staticArc[i], transform);
+            }
+            for (int i = 0; i < transformedArc.Count; i++)
+            {
+                points[point++] = Vector2.Transform(transformedArc[i], transform);
+            }
+
+            FillPath(brush, points);
         }
 
         /// <summary>
