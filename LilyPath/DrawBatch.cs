@@ -1878,7 +1878,7 @@ namespace LilyPath
         public void FillCrescent (Brush brush, Vector2 center, float radius, float rotation, float progress, int subdivisions)
         {
             if (progress == 0) return;
-            
+
             subdivisions *= 2;
 
             // get 180° arc
@@ -2392,14 +2392,21 @@ namespace LilyPath
         private void RenderBatch (PrimitiveType primitiveType, int indexOffset, int indexCount, int vertexOffset, int vertexCount, Texture2D texture)
         {
             _device.Textures[0] = texture;
+
             switch (primitiveType) {
                 case PrimitiveType.LineList:
-                    _device.DrawUserIndexedPrimitives(primitiveType, _vertexBuffer, vertexOffset, vertexCount, _indexBuffer, indexOffset, indexCount / 2);
+                    indexCount /= 2;
                     break;
                 case PrimitiveType.TriangleList:
-                    _device.DrawUserIndexedPrimitives(primitiveType, _vertexBuffer, vertexOffset, vertexCount, _indexBuffer, indexOffset, indexCount / 3);
+                    indexCount /= 3;
+                    break;
+                case PrimitiveType.TriangleStrip:
+                    indexCount -= 2;
                     break;
             }
+
+            _device.DrawUserIndexedPrimitives(primitiveType, _vertexBuffer, vertexOffset, vertexCount, 
+                _indexBuffer, indexOffset, indexCount);
         }
 
         private void ClearInfoBuffer ()
