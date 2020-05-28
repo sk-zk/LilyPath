@@ -700,17 +700,6 @@ namespace LilyPath
                 FlushBuffer();
         }
 
-        /*public void DrawPath (GraphicsPath path, ref Matrix vertexTransform)
-        {
-            if (!_inDraw)
-                throw new InvalidOperationException();
-
-            DrawPathInner(path, ref vertexTransform, true);
-
-            if (_sortMode == DrawSortMode.Immediate)
-                FlushBuffer();
-        }*/
-
         private void DrawPathInner (GraphicsPath path, ref Matrix vertexTransform, bool applyVertexTransform)
         {
             RequestBufferSpace(path.VertexCount, path.IndexCount);
@@ -743,11 +732,6 @@ namespace LilyPath
 
             foreach (GraphicsPath outlinePath in path.OutlinePaths)
                 DrawPathInner(outlinePath, ref vertexTransform, applyVertexTransform);
-        }
-
-        private void TransformData (Vector3[] data, int start, int length, ref Matrix tranform)
-        {
-            //Vector3.Transform()
         }
 
         /// <summary>
