@@ -1875,10 +1875,46 @@ namespace LilyPath
                 FlushBuffer();
         }
 
-        public void FillCrescent (Brush brush, Vector2 center, float radius, float rotation, float progress, int subdivisions)
+        public void FillCrescent (Brush brush, Vector2 center, float radius, float rotation, 
+            float progress, int subdivisions)
         {
+            if (!_inDraw)
+                throw new InvalidOperationException();
+            if (brush == null)
+                throw new ArgumentNullException("brush");
+
             if (progress == 0) return;
 
+            Vector2[] points = BuildCrescent(center, radius, rotation, progress, subdivisions);   
+            for (int i = 0; i < points.Length; i++)
+            {
+                AddVertex(points[i], brush);
+            }
+
+            // Create a TriangleStrip out of the points.
+            // Here's a visual representation of what this code is doing:
+            // https://i.imgur.com/4sdTj7l.png
+            AddInfo(PrimitiveType.TriangleStrip, points.Length, points.Length, brush);
+            short left = 0;
+            short right = (short)(points.Length - 1);
+            // make first triangle
+            _indexBuffer[_indexBufferIndex++] = left++;
+            // then alternate top and bottom arc
+            while (left < right)
+            {
+                _indexBuffer[_indexBufferIndex++] = left++;
+                _indexBuffer[_indexBufferIndex++] = right--;
+            }
+            // and add the last remaining point
+            _indexBuffer[_indexBufferIndex++] = left++;
+
+            if (_sortMode == DrawSortMode.Immediate)
+                FlushBuffer();
+        }
+
+        private Vector2[] BuildCrescent (Vector2 center, float radius, float rotation, 
+            float progress, int subdivisions, bool removeDuplicatePoints = true)
+        {
             subdivisions *= 2;
 
             // get 180° arc
@@ -1887,7 +1923,8 @@ namespace LilyPath
 
             // create the second arc by squashing a copy of the first
             List<Vector2> transformedArc = new List<Vector2>(staticArc);
-            transformedArc = transformedArc.GetRange(1, transformedArc.Count - 2); // remove duplicate points
+            if (removeDuplicatePoints)
+                transformedArc = transformedArc.GetRange(1, transformedArc.Count - 2);
             float scale = -((progress * 2) - 1);
             Matrix arcTransform = Matrix.CreateScale(1, scale, 1);
             for (int i = 0; i < transformedArc.Count; i++)
@@ -1911,7 +1948,7 @@ namespace LilyPath
                 points[point++] = Vector2.Transform(transformedArc[i], transform);
             }
 
-            FillPath(brush, points);
+            return points;
         }
 
         /// <summary>
