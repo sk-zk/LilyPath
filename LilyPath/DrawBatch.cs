@@ -2192,6 +2192,23 @@ namespace LilyPath
                 FlushBuffer();
         }
 
+        public void FillTriangleList (Brush brush, IList<Vector2> vertices, IList<int> tris)
+        {
+            RequestBufferSpace(vertices.Count, tris.Count);
+            AddInfo(PrimitiveType.TriangleList, vertices.Count, tris.Count, brush);
+
+            for (int i = 0; i < vertices.Count; i++) {
+                AddVertex(vertices[i], brush);
+            }
+
+            for (int i = 0; i < tris.Count; i += 3) {
+                AddTriangle(tris[i], tris[i+1], tris[i+2]);
+            }
+
+            if (_sortMode == DrawSortMode.Immediate)
+                FlushBuffer();
+        }
+
         /// <summary>
         /// Immediatley renders a <see cref="DrawCache"/> object.
         /// </summary>
