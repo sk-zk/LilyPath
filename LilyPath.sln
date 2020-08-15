@@ -3,9 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LilyPath", "LilyPath\LilyPath.csproj", "{2921C80E-2B58-41C4-B834-B92A478C3631}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LilyPath", "LilyPath\LilyPath.shproj", "{A0CDBD0E-3A41-42B7-9425-A838BC2C7383}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		LilyPath\LilyPath.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -16,23 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|Mixed Platforms = Release|Mixed Platforms
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release.Android|Any CPU.ActiveCfg = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release.Android|Any CPU.Build.0 = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release.Android|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release.Android|Mixed Platforms.Build.0 = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release.Android|x86.ActiveCfg = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{2921C80E-2B58-41C4-B834-B92A478C3631}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
