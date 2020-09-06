@@ -755,7 +755,7 @@ namespace LilyPath
         /// <param name="radius">The radius of the circle.</param>
         /// <param name="subdivisions">The number of subdivisions (sides) to render the circle with.</param>
         /// <exception cref="InvalidOperationException"><c>DrawCircle</c> was called, but <see cref="Begin()"/> has not yet been called.</exception>
-        public void DrawCircle (Pen pen, Vector2 center, float radius, int subdivisions)
+        public void DrawCircle (Pen pen, Vector2 center, float radius, int subdivisions, Matrix? transform = null)
         {
             if (!_inDraw)
                 throw new InvalidOperationException();
@@ -764,7 +764,8 @@ namespace LilyPath
 
             _ws.ResetWorkspace(pen);
 
-            BuildCircleGeometryBuffer(center, radius, subdivisions, false);
+            BuildCircleGeometryBuffer(center, radius, subdivisions, false, transform);
+
             AddClosedPath(_geometryBuffer, 0, subdivisions, pen, _ws);
 
             if (_sortMode == DrawSortMode.Immediate)
@@ -896,9 +897,17 @@ namespace LilyPath
             DrawPrimitivePath(pen, _geometryBuffer, 0, subdivisions, PathType.Closed);
         }
 
-        private void BuildCircleGeometryBuffer (Vector2 center, float radius, int subdivisions, bool connect)
+        private void BuildCircleGeometryBuffer (Vector2 center, float radius, int subdivisions,
+            bool connect, Matrix? transform = null)
         {
             List<Vector2> unitCircle = CalculateCircleSubdivisions(subdivisions);
+
+            if (transform != null)
+            {
+                unitCircle = new List<Vector2>(unitCircle);
+                for (int i = 0; i < unitCircle.Count; i++)
+                    unitCircle[i] = Vector2.Transform(unitCircle[i], transform.Value);
+            }
 
             if (_geometryBuffer.Length < subdivisions + 1)
                 Array.Resize(ref _geometryBuffer, (subdivisions + 1) * 2);
@@ -1742,7 +1751,7 @@ namespace LilyPath
         /// <param name="radius">The radius of the circle.</param>
         /// <param name="subdivisions">The number of subdivisions to render the circle with.</param>
         /// <exception cref="InvalidOperationException"><c>FillCircle</c> was called, but <see cref="Begin()"/> has not yet been called.</exception>
-        public void FillCircle (Brush brush, Vector2 center, float radius, int subdivisions)
+        public void FillCircle (Brush brush, Vector2 center, float radius, int subdivisions, Matrix? transform = null)
         {
             if (!_inDraw)
                 throw new InvalidOperationException();
@@ -1752,7 +1761,7 @@ namespace LilyPath
             RequestBufferSpace(subdivisions + 1, subdivisions * 3);
             AddInfo(PrimitiveType.TriangleList, subdivisions + 1, subdivisions * 3, brush);
 
-            BuildCircleGeometryBuffer(center, radius, subdivisions, true);
+            BuildCircleGeometryBuffer(center, radius, subdivisions, true, transform);
 
             int baseVertexIndex = _vertexBufferIndex;
 
