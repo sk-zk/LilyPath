@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using LilyPath.Utility;
 using System.Linq;
+using System.Globalization;
 
 namespace LilyPath
 {
@@ -767,6 +768,91 @@ namespace LilyPath
             BuildCircleGeometryBuffer(center, radius, subdivisions, false, transform);
 
             AddClosedPath(_geometryBuffer, 0, subdivisions, pen, _ws);
+
+            if (_sortMode == DrawSortMode.Immediate)
+                FlushBuffer();
+        }
+
+        /// <summary>
+        /// A simpler circle drawing method which is faster than DrawCircle but
+        ///  doesn't support most pen features.
+        /// </summary>
+        /// <param name="pen">The pen to render the path with.</param>
+        /// <param name="center">The center coordinate of the circle.</param>
+        /// <param name="radius">The radius of the circle.</param>
+        /// <param name="subdivisions">The number of subdivisions (sides) to render the circle with.</param>
+        /// <exception cref="InvalidOperationException"><c>DrawCircle</c> was called, but <see cref="Begin()"/> has not yet been called.</exception>
+        public void DrawCircleSimple(Pen pen, Vector2 center, float radius, int subdivisions)
+        {
+            if (!_inDraw)
+                throw new InvalidOperationException();
+            if (pen == null)
+                throw new ArgumentNullException("pen");
+
+            _ws.ResetWorkspace(pen);
+
+            float secondMagnitude;
+            switch (pen.Alignment)
+            {
+                case PenAlignment.Inset:
+                    secondMagnitude = radius - pen.Width;
+                    break;
+                case PenAlignment.Outset:
+                    secondMagnitude = radius + pen.Width;
+                    break;
+                case PenAlignment.Center:
+                    var oldRadius = radius;
+
+                    var halfWidth = pen.Width / 2;
+
+                    radius -= halfWidth;
+                    secondMagnitude = oldRadius + halfWidth;
+                    break;
+                default:
+                    secondMagnitude = radius;
+                    break;
+            }
+
+            BuildCircleGeometryBuffer(center, radius, subdivisions, false, null);
+
+            var vertCount = subdivisions * 2;
+            var indexCount = vertCount + 2;
+
+            RequestBufferSpace(vertCount, indexCount);
+            AddInfo(PrimitiveType.TriangleStrip, vertCount, indexCount, pen.Brush);
+
+            // fill vertex buffer
+            for (int i = 0; i < subdivisions; i++)
+            {
+                Vector2 point = _geometryBuffer[i];
+
+                // create second point
+                var dir = point - center;
+                dir.Normalize();
+                var secondPoint = center + (dir * secondMagnitude);
+
+                // insert points the right way so they don't get culled
+                if (radius > secondMagnitude)
+                {
+                    AddVertex(point, pen);
+                    AddVertex(secondPoint, pen);
+                } 
+                else
+                { 
+                   AddVertex(secondPoint, pen);
+                   AddVertex(point, pen);
+                }
+            }
+
+            // fill index buffer.
+            // we've added the vertices in such a way
+            // that we can simply pass 0,1,2,...,n,0,1.
+            for (int i = 0; i < vertCount; i++)
+            {
+                _indexBuffer[_indexBufferIndex++] = (short)i;
+            }
+            _indexBuffer[_indexBufferIndex++] = 0;
+            _indexBuffer[_indexBufferIndex++] = 1;
 
             if (_sortMode == DrawSortMode.Immediate)
                 FlushBuffer();
