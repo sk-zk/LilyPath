@@ -60,7 +60,7 @@ namespace LilyPath.Pens
 
         private Color Lerp (float amount)
         {
-            Color c0 = Color.TransparentBlack;
+            Color c0 = Color.Transparent;
             c0.R = (byte)(_r1 + _rdiff * amount);
             c0.G = (byte)(_g1 + _gdiff * amount);
             c0.B = (byte)(_b1 + _bdiff * amount);
