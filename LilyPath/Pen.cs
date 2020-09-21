@@ -335,6 +335,12 @@ namespace LilyPath
         {
         }
 
+        public Pen (Color color, float width, PenAlignment alignment) 
+            : this(new SolidColorBrush(color), width, true)
+        {
+            Alignment = alignment;
+        }
+
         /// <summary>
         /// Creates a new <see cref="Pen"/> with the given brush and a width of 1.
         /// </summary>
