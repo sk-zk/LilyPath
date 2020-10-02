@@ -775,7 +775,7 @@ namespace LilyPath
 
         /// <summary>
         /// A simpler circle drawing method which is faster than DrawCircle but
-        ///  doesn't support most pen features.
+        /// doesn't support most pen features.
         /// </summary>
         /// <param name="pen">The pen to render the path with.</param>
         /// <param name="center">The center coordinate of the circle.</param>
@@ -802,9 +802,7 @@ namespace LilyPath
                     break;
                 case PenAlignment.Center:
                     var oldRadius = radius;
-
                     var halfWidth = pen.Width / 2;
-
                     radius -= halfWidth;
                     secondMagnitude = oldRadius + halfWidth;
                     break;
@@ -820,6 +818,8 @@ namespace LilyPath
 
             RequestBufferSpace(vertCount, indexCount);
             AddInfo(PrimitiveType.TriangleStrip, vertCount, indexCount, pen.Brush);
+
+            var vertIdx = _vertexBufferIndex;
 
             // fill vertex buffer
             for (int i = 0; i < subdivisions; i++)
@@ -849,10 +849,10 @@ namespace LilyPath
             // that we can simply pass 0,1,2,...,n,0,1.
             for (int i = 0; i < vertCount; i++)
             {
-                _indexBuffer[_indexBufferIndex++] = (short)i;
+                _indexBuffer[_indexBufferIndex++] = (short)(vertIdx + i);
             }
-            _indexBuffer[_indexBufferIndex++] = 0;
-            _indexBuffer[_indexBufferIndex++] = 1;
+            _indexBuffer[_indexBufferIndex++] = (short)vertIdx;
+            _indexBuffer[_indexBufferIndex++] = (short)(vertIdx + 1);
 
             if (_sortMode == DrawSortMode.Immediate)
                 FlushBuffer();
@@ -1980,11 +1980,10 @@ namespace LilyPath
 
             if (progress == 0) return;
 
-            Vector2[] points = BuildCrescent(center, radius, rotation, progress, subdivisions);   
+            Vector2[] points = BuildCrescent(center, radius, rotation, progress, subdivisions);
+            var vertIdx = _vertexBufferIndex;
             for (int i = 0; i < points.Length; i++)
-            {
                 AddVertex(points[i], brush);
-            }
 
             // Create a TriangleStrip out of the points.
             // Here's a visual representation of what this code is doing:
@@ -1993,15 +1992,15 @@ namespace LilyPath
             short left = 0;
             short right = (short)(points.Length - 1);
             // make first triangle
-            _indexBuffer[_indexBufferIndex++] = left++;
+            _indexBuffer[_indexBufferIndex++] = (short)(vertIdx + left++);
             // then alternate top and bottom arc
             while (left < right)
             {
-                _indexBuffer[_indexBufferIndex++] = left++;
-                _indexBuffer[_indexBufferIndex++] = right--;
+                _indexBuffer[_indexBufferIndex++] = (short)(vertIdx + left++);
+                _indexBuffer[_indexBufferIndex++] = (short)(vertIdx + right--);
             }
             // and add the last remaining point
-            _indexBuffer[_indexBufferIndex++] = left++;
+            _indexBuffer[_indexBufferIndex++] = (short)(vertIdx + left++);
 
             if (_sortMode == DrawSortMode.Immediate)
                 FlushBuffer();
@@ -2292,14 +2291,14 @@ namespace LilyPath
             RequestBufferSpace(vertices.Count, tris.Count);
             AddInfo(PrimitiveType.TriangleList, vertices.Count, tris.Count, brush);
 
-            for (int i = 0; i < vertices.Count; i++) {
+            var vertIdx = _vertexBufferIndex;
+
+            for (int i = 0; i < vertices.Count; i++)
                 AddVertex(vertices[i], brush);
-            }
-
-            for (int i = 0; i < tris.Count; i += 3) {
-                AddTriangle(tris[i], tris[i+1], tris[i+2]);
-            }
-
+            
+            for (int i = 0; i < tris.Count; i += 3) 
+                AddTriangle(vertIdx + tris[i], vertIdx + tris[i+1], vertIdx + tris[i+2]);
+            
             if (_sortMode == DrawSortMode.Immediate)
                 FlushBuffer();
         }
@@ -2441,7 +2440,7 @@ namespace LilyPath
             vertex.Position = new Vector3(position, 0);
             vertex.Color = color;
 
-            if (pen.Brush != null) {
+           if (pen.Brush != null) {
                 vertex.TextureCoordinate = Vector2.Transform(position, pen.Brush.Transform);
                 vertex.Color *= pen.Brush.Alpha;
             }
