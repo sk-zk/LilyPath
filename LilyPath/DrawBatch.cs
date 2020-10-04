@@ -1981,6 +1981,9 @@ namespace LilyPath
             if (progress == 0) return;
 
             Vector2[] points = BuildCrescent(center, radius, rotation, progress, subdivisions);
+
+            AddInfo(PrimitiveType.TriangleStrip, points.Length, points.Length, brush);
+
             var vertIdx = _vertexBufferIndex;
             for (int i = 0; i < points.Length; i++)
                 AddVertex(points[i], brush);
@@ -1988,7 +1991,6 @@ namespace LilyPath
             // Create a TriangleStrip out of the points.
             // Here's a visual representation of what this code is doing:
             // https://i.imgur.com/4sdTj7l.png
-            AddInfo(PrimitiveType.TriangleStrip, points.Length, points.Length, brush);
             short left = 0;
             short right = (short)(points.Length - 1);
             // make first triangle
