@@ -79,8 +79,8 @@ namespace LilyPath
             _device.DeviceReset += GraphicsDeviceReset;
 
             _infoBuffer = new DrawingInfo[2048];
-            _indexBuffer = new short[32768];
-            _vertexBuffer = new VertexPositionColorTexture[8192];
+            _indexBuffer = new short[65536];
+            _vertexBuffer = new VertexPositionColorTexture[16384];
             _computeBuffer = new Vector2[64];
             _colorBuffer = new Color[64];
             _geometryBuffer = new Vector2[256];
