@@ -9,10 +9,10 @@ namespace LilyPath
     /// </summary>
     public class Triangulator
     {
-        private int[] _triPrev = new int[128];
-        private int[] _triNext = new int[128];
+        private int[] _triPrev = new int[512];
+        private int[] _triNext = new int[512];
 
-        private int[] _indexComputeBuffer = new int[128];
+        private int[] _indexComputeBuffer = new int[512];
         private int _indexCount = 0;
 
         /// <summary>
