@@ -2373,6 +2373,9 @@ namespace LilyPath
 
         private void AddInfo (PrimitiveType primitiveType, int vertexCount, int indexCount, Texture2D texture)
         {
+            if (_vertexBuffer.Length < _vertexBufferIndex + vertexCount)
+                FlushBuffer();
+
             _infoBuffer[_infoBufferIndex].Primitive = primitiveType;
             _infoBuffer[_infoBufferIndex].Texture = texture ?? _defaultTexture;
             _infoBuffer[_infoBufferIndex].IndexCount = indexCount;
@@ -2439,7 +2442,7 @@ namespace LilyPath
         private void AddVertex (Vector2 position, Color color, Pen pen)
         {
             VertexPositionColorTexture vertex = new VertexPositionColorTexture();
-            vertex.Position = new Vector3(position, 0);
+            vertex.Position = new Vector3(position, 0f);
             vertex.Color = color;
 
            if (pen.Brush != null) {
@@ -2456,7 +2459,7 @@ namespace LilyPath
         private void AddVertex (Vector2 position, Brush brush)
         {
             VertexPositionColorTexture vertex = new VertexPositionColorTexture();
-            vertex.Position = new Vector3(position, 0);
+            vertex.Position = new Vector3(position, 0f);
             vertex.Color = brush.Color;
 
             if (brush != null) {
